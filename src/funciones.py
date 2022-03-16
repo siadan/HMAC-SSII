@@ -24,7 +24,16 @@ def decodificarMensajeyClave(data, conn, clave):
         conn.sendall(codificarMensaje("Ha habido un error de integridad en la transmision, realice de nuevo la transferencia", 
                                       clave))
 
+def sacarPalabrasDelDiccionario(file):
+    diccionario = {}
+    with open(file, encoding="utf-8") as f:
+        for linea in f:
+            trozos = linea.split(":")
+            diccionario[trozos[0]] = int(trozos[0], 36) 
+    return diccionario
 
 
 if __name__ == '__main__':
-    pass
+    diccionario = sacarPalabrasDelDiccionario("./diccionario/diccionarioPalabras.txt")
+    for key in diccionario:
+        print("KEY: " + str(key) + " - VALUE: " + str(diccionario[key]))
