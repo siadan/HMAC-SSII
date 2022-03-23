@@ -5,17 +5,12 @@ from datetime import datetime
 import numpy as np
 from randomgen import ChaCha
 
-'''global fechaIni
-global diccPalSeed
-global seed
-global contadorTransacciones'''
 
 def codificarMensaje(inputValue, clave):
     seed = importarSeed()
     nonce = generarNonce(seed)
     mensyClave = (str(nonce)+inputValue+str(clave)).encode("utf-8")
     hasheo =  hashlib.sha3_256(mensyClave).hexdigest()
-    #print("Hash del mensaje: " + str(hasheo))
     mensajeConc = inputValue + "\n" + str(hasheo)
     mensByte = mensajeConc.encode("utf-8")
     return mensByte
@@ -31,17 +26,7 @@ def comprobarIntegridad(trozos, clave):
     nonce = generarNonce(seed)
     mensyClave = (str(nonce) + str(trozos[0]) + str(clave)).encode("utf-8")
     hasheo =  hashlib.sha3_256(mensyClave).hexdigest()
-    ''''f = open("./configuracion/config.txt", "r")
-    lineas = f.readlines()
-    numComm = int(lineas[2].split("=")[1].strip())
-    lineas[2] = "Numero Comunicacion="+str(numComm+1)
-    f = open("./configuracion/config.txt", "w")
-    f.writelines(lineas)
-    f.close()'''
     if str(hasheo) == str(trozos[1]):
-        #codificarMensaje("Transferencia realizada con exito", clave)
-        #conn.sendall(codificarMensaje("Transferencia realizada con exito", clave))
-        #print("Received " + str(mensyClave))
         return True
     else:
         return False
@@ -71,23 +56,6 @@ def iniciar():
         f.write("Fecha Config=" + str(fecha) + "\n")
         f.write("Fecha Ultima=" + str(fecha) + "\n")
         f.write("Numero Comunicacion=" + str(0))
-
-'''def importar():
-    with open("./configuracion/config.txt", "r") as f:
-        global fechaIni
-        fechaIni = datetime.strptime(f.readline(), "%d-%m-%Y")
-    
-    global diccPalSeed
-    diccPalSeed = sacarPalabrasDelDiccionario("./diccionario/diccionarioPalabras.txt")
-    
-    fechaHoy = datetime.today()
-    indiceSeed = (fechaHoy-fechaIni).days
-    keys = []
-    for k in diccPalSeed.keys(): 
-        keys.append(k)
-    pal = keys[indiceSeed]
-    global seed
-    seed = diccPalSeed[pal]'''
     
 def importarSeed():
     with open("./configuracion/config.txt", "r") as f:
@@ -143,12 +111,3 @@ def actualizarContador():
 
 if __name__ == '__main__':
     iniciar()
-    #importar()
-    #coded = codificarMensaje("olakasee", 123)
-    #print(coded)
-    #decoded = decodificarMensaje(coded)
-    #print(comprobarIntegridad(decoded, 123))
-    
-    #diccionario = sacarPalabrasDelDiccionario("./diccionario/diccionarioPalabras.txt")
-    #for key in diccionario:
-    #    print("KEY: " + str(key) + " - VALUE: " + str(diccionario[key]))
