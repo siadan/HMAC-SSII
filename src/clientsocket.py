@@ -7,7 +7,7 @@ from src import funciones
 
 HOST = "127.0.0.1"  # The server's hostname or IP address
 PORT = 3030  # The port used by the server
-clave = 238758256798463278562457832479856984730
+clave = "472D4B6150645367566B5970337336763979244226452948404D625165546857"
 
 origen = input("Introduzca la cuenta de origen: ")
 destino = input("Introduzca la cuenta de destino: ")
