@@ -4,15 +4,17 @@ import hashlib
 from datetime import datetime
 import numpy as np
 from randomgen import ChaCha
+from _overlapped import NULL
 
-global fechaIni
+'''global fechaIni
 global diccPalSeed
 global seed
-global contadorTransacciones
+global contadorTransacciones'''
 
 def codificarMensaje(inputValue, clave):
-    ### Generar nonce a partir de seed y del número de transaccion
-    mensyClave = (inputValue+str(clave)).encode("utf-8")
+    seed = importarSeed()
+    nonce = generarNonce(seed)
+    mensyClave = (str(nonce)+inputValue+str(clave)).encode("utf-8")
     hasheo =  hashlib.sha3_256(mensyClave).hexdigest()
     #print("Hash del mensaje: " + str(hasheo))
     mensajeConc = inputValue + "\n" + str(hasheo)
@@ -26,8 +28,17 @@ def decodificarMensaje(data):
     return trozos
         
 def comprobarIntegridad(trozos, clave):
-    mensyClave = (str(trozos[0]) + str(clave)).encode("utf-8")
+    seed = importarSeed()
+    nonce = generarNonce(seed)
+    mensyClave = (str(nonce) + str(trozos[0]) + str(clave)).encode("utf-8")
     hasheo =  hashlib.sha3_256(mensyClave).hexdigest()
+    ''''f = open("./configuracion/config.txt", "r")
+    lineas = f.readlines()
+    numComm = int(lineas[2].split("=")[1].strip())
+    lineas[2] = "Numero Comunicacion="+str(numComm+1)
+    f = open("./configuracion/config.txt", "w")
+    f.writelines(lineas)
+    f.close()'''
     if str(hasheo) == str(trozos[1]):
         #codificarMensaje("Transferencia realizada con exito", clave)
         #conn.sendall(codificarMensaje("Transferencia realizada con exito", clave))
@@ -58,9 +69,11 @@ def sacarPalabrasDelDiccionario(file):
 def iniciar():
     fecha = datetime.today().strftime("%d-%m-%Y")
     with open("./configuracion/config.txt", "w") as f:
-        f.write(str(fecha))
+        f.write("Fecha Config=" + str(fecha) + "\n")
+        f.write("Fecha Ultima=" + str(fecha) + "\n")
+        f.write("Numero Comunicacion=" + str(0))
 
-def importar():
+'''def importar():
     with open("./configuracion/config.txt", "r") as f:
         global fechaIni
         fechaIni = datetime.strptime(f.readline(), "%d-%m-%Y")
@@ -75,7 +88,54 @@ def importar():
         keys.append(k)
     pal = keys[indiceSeed]
     global seed
+    seed = diccPalSeed[pal]'''
+    
+def importarSeed():
+    with open("./configuracion/config.txt", "r") as f:
+        fechaStr = f.readline().split("=")[1].strip()
+        fechaIni = datetime.strptime(fechaStr, "%d-%m-%Y")
+    
+    diccPalSeed = sacarPalabrasDelDiccionario("./diccionario/diccionarioPalabras.txt")
+    
+    fechaHoy = datetime.today()
+    indiceSeed = (fechaHoy-fechaIni).days % 165
+    keys = []
+    for k in diccPalSeed.keys(): 
+        keys.append(k)
+    pal = keys[indiceSeed]
     seed = diccPalSeed[pal]
+    return seed
+
+def generarNonce(seed):
+    with open("./configuracion/config.txt", "r") as f:
+        next(f)
+        next(f)
+        numMens = int(f.readline().split("=")[1])
+    rg = np.random.Generator(ChaCha(seed=seed, rounds=8))
+    nonces = rg.integers(1,9000,size=9999)
+    return nonces[numMens]
+
+def comprobarContador():
+    hoy = datetime.today().strftime("%d-%m-%Y")
+    f = open("./configuracion/config.txt", "r")
+    lineas = f.readlines()
+    fechaUlt = lineas[1].split("=")[1].strip()
+    if fechaUlt != str(hoy):
+        lineas[1] = "Fecha Ultima="+str(hoy)+"\n"
+        lineas[2] = "Numero Comunicacion=0"
+        f = open("./configuracion/config.txt", "w")
+        f.writelines(lineas)
+    f.close()
+  
+def actualizarContador():  
+    f = open("./configuracion/config.txt", "r")
+    lineas = f.readlines()
+    numComm = int(lineas[2].split("=")[1].strip())
+    lineas[2] = "Numero Comunicacion="+str(numComm+1)
+    f = open("./configuracion/config.txt", "w")
+    f.writelines(lineas)
+    f.close()
+    
     
     
     
@@ -84,9 +144,11 @@ def importar():
 
 if __name__ == '__main__':
     iniciar()
-    importar()
-    print(diccPalSeed["Abad"])
-    print(seed)
+    #importar()
+    #coded = codificarMensaje("olakasee", 123)
+    #print(coded)
+    #decoded = decodificarMensaje(coded)
+    #print(comprobarIntegridad(decoded, 123))
     
     #diccionario = sacarPalabrasDelDiccionario("./diccionario/diccionarioPalabras.txt")
     #for key in diccionario:
