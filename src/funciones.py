@@ -4,7 +4,6 @@ import hashlib
 from datetime import datetime
 import numpy as np
 from randomgen import ChaCha
-from _overlapped import NULL
 
 '''global fechaIni
 global diccPalSeed
