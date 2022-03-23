@@ -1,3 +1,3 @@
 Fecha Config=20-01-2022
 Fecha Ultima=23-03-2022
-Numero Comunicacion=16
+Numero Comunicacion=28
