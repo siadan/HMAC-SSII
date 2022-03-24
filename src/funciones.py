@@ -52,17 +52,17 @@ def sacarPalabrasDelDiccionario(file):
 
 def iniciar():
     fecha = datetime.datetime.today().strftime("%d-%m-%Y")
-    with open("src\configuracion\config.txt", "w") as f:
+    with open("./configuracion/config.txt", "w") as f:
         f.write("Fecha Config=" + str(fecha) + "\n")
         f.write("Fecha Ultima=" + str(fecha) + "\n")
         f.write("Numero Comunicacion=" + str(0))
     
 def importarSeed():
-    with open("src\configuracion\config.txt", "r") as f:
+    with open("./configuracion/config.txt", "r") as f:
         fechaStr = f.readline().split("=")[1].strip()
         fechaIni = datetime.datetime.strptime(fechaStr, "%d-%m-%Y")
     
-    diccPalSeed = sacarPalabrasDelDiccionario("src\diccionario\diccionarioPalabras.txt")
+    diccPalSeed = sacarPalabrasDelDiccionario("./diccionario/diccionarioPalabras.txt")
     
     fechaHoy = datetime.datetime.today()
     indiceSeed = (fechaHoy-fechaIni).days % 165
@@ -74,7 +74,7 @@ def importarSeed():
     return seed
 
 def generarNonce(seed):
-    with open("src\configuracion\config.txt", "r") as f:
+    with open("./configuracion/config.txt", "r") as f:
         next(f)
         next(f)
         numMens = int(f.readline().split("=")[1])
@@ -84,22 +84,22 @@ def generarNonce(seed):
 
 def comprobarContador():
     hoy = datetime.datetime.today().strftime("%d-%m-%Y")
-    f = open("src\configuracion\config.txt", "r")
+    f = open("./configuracion/config.txt", "r")
     lineas = f.readlines()
     fechaUlt = lineas[1].split("=")[1].strip()
     if fechaUlt != str(hoy):
         lineas[1] = "Fecha Ultima="+str(hoy)+"\n"
         lineas[2] = "Numero Comunicacion=0"
-        f = open("src\configuracion\config.txt", "w")
+        f = open("./configuracion/config.txt", "w")
         f.writelines(lineas)
     f.close()
   
 def actualizarContador():  
-    f = open("src\configuracion\config.txt", "r")
+    f = open("./configuracion/config.txt", "r")
     lineas = f.readlines()
     numComm = int(lineas[2].split("=")[1].strip())
     lineas[2] = "Numero Comunicacion="+str(numComm+1)
-    f = open("src\configuracion\config.txt", "w")
+    f = open("./configuracion/config.txt", "w")
     f.writelines(lineas)
     f.close()
     

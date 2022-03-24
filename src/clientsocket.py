@@ -2,7 +2,7 @@
 
 import socket
 import time
-import funciones
+from src import funciones
 import datetime
 
 
@@ -21,35 +21,21 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         #Codificar el mensaje con lo que mandamos y la clave simetrica
         mensCompleto = origen + "," + destino + "," + cantidad
         funciones.actualizarContador()
-        time_codificar1 = datetime.datetime.now()
         mensByte = funciones.codificarMensaje(mensCompleto, clave)
-        time_codificar2 = datetime.datetime.now()
-        
         s.sendall(mensByte)
         data = s.recv(1024)
         if not data:
             break
-
-        time_descodificar1 = datetime.datetime.now()
         mens = funciones.decodificarMensaje(data)
-        time_descodificar2 = datetime.datetime.now()
-        codificar = time_codificar2-time_codificar1
-        print("Tiempo tardado en codificar el mensaje: " + str(codificar))
         if funciones.comprobarIntegridad(mens, clave) and mens[0] == "Transferencia realizada con exito":
             print("Transferencia realizada con exito")
-            time.sleep(1)
             print("Cerrando conexión")
-            time.sleep(2)
             break
         elif funciones.comprobarIntegridad(mens, clave) and mens[0] == "Se ha producido un error de integridad, vuelva a realizar la transferencia":
             print("Se ha producido un error de integridad, vuelva a realizar la transferencia")
-            time.sleep(1)
             print("Cerrando conexión")
-            time.sleep(2)
             break
         elif not(funciones.comprobarIntegridad(mens, clave)):
             print("Ha habido un error de integridad en la respuesta, consulte con el servidor si la transacción se ha realizado correctamente.")
-            time.sleep(1)
             print("Cerrando conexión")
-            time.sleep(2)
             break
